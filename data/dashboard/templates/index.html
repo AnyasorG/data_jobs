@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Dynamic Data Visualizations</h1>
+
+        <!-- Country Chart -->
+        <h2>Job Opportunities by Country</h2>
+        <canvas id="countriesChart"></canvas>
+
+        <!-- Salary Chart -->
+        <h2>Salary Expectations</h2>
+        <canvas id="salaryChart"></canvas>
+
+        <!-- Entry-Level Hiring Chart -->
+        <h2>Entry-Level Job Opportunities by Company</h2>
+        <canvas id="entryLevelChart"></canvas>
+
+        <!-- Yearly Trends Chart -->
+        <h2>Yearly Salary and Job Trends</h2>
+        <canvas id="yearlyTrendsChart"></canvas>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>
