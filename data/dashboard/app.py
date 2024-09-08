@@ -1,7 +1,6 @@
 from flask import Flask, jsonify, render_template, request
 import pandas as pd
 import os
-import random
 
 app = Flask(__name__)
 
@@ -29,7 +28,7 @@ def countries_data():
         print(f"Error loading countries data: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-# Updated route to handle Job Category, Experience Level, and Job Title
+# Route to handle Job Category, Experience Level, and Job Title
 @app.route('/salary-data')
 def salary_data():
     try:
@@ -82,58 +81,46 @@ def salary_data():
 @app.route('/us-entry-level-data')
 def us_entry_level_data():
     try:
-        # Load the CSV file
         csv_path = get_csv_path()
         df = pd.read_csv(csv_path)
 
-        # Filter for US ('US') and entry-level employees
+        # Filter for US and entry-level employees
         df_filtered = df[(df['company_location'] == 'US') & (df['experience_level'] == 'Entry-level/Junior')]
 
-        # Check if the filtered data is empty
         if df_filtered.empty:
-            print(f"No data found for US and Entry-level employees.")
             return jsonify({"message": "No data available for the selected criteria"}), 200
 
-        # Filter by year if provided
         year = request.args.get('year', 'all')
         if year != 'all':
             df_filtered = df_filtered[df_filtered['work_year'] == int(year)]
-            print(f"Filtered Data for Year {year}: \n{df_filtered.head()}")
 
-        # Map 'L', 'M', 'S' to full forms 'Large', 'Medium', 'Small' using .loc to avoid the warning
+        # Map 'L', 'M', 'S' to full forms 'Large', 'Medium', 'Small'
         size_mapping = {'L': 'Large', 'M': 'Medium', 'S': 'Small'}
         df_filtered.loc[:, 'company_size'] = df_filtered['company_size'].replace(size_mapping)
 
-        # Count hires per company size (now with full names)
         companies = df_filtered['company_size'].value_counts().to_dict()
 
         return jsonify(companies)
 
     except Exception as e:
-        # Log the error for easier debugging
         print(f"Error loading US entry-level data: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/us-work-setting-data')
 def us_work_setting_data():
     try:
-        # Load the CSV file
         csv_path = get_csv_path()
         df = pd.read_csv(csv_path)
 
-        # Filter for US ('US') and entry-level employees
+        # Filter for US and entry-level employees
         df_filtered = df[(df['company_location'] == 'US') & (df['experience_level'] == 'Entry-level/Junior')]
 
-        # Check if the filtered data is empty
         if df_filtered.empty:
-            print(f"No data found for US and Entry-level employees.")
             return jsonify({"message": "No data available for the selected criteria"}), 200
 
-        # Filter by year if provided
         year = request.args.get('year', 'all')
         if year != 'all':
             df_filtered = df_filtered[df_filtered['work_year'] == int(year)]
-            print(f"Filtered Data for Year {year}: \n{df_filtered.head()}")
 
         # Process work setting data based on remote_ratio
         work_setting_data = {
@@ -145,7 +132,6 @@ def us_work_setting_data():
         return jsonify(work_setting_data)
 
     except Exception as e:
-        # Log the error for easier debugging
         print(f"Error loading US work setting data: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
