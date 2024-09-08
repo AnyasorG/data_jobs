@@ -1,0 +1,232 @@
+/* Global styles for the Data Analyst Jobs Dashboard */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fffdfd;
+    forced-color-adjust: auto;
+    /* Added for Forced Colors Mode compatibility */
+}
+
+/* Header styling */
+header {
+    text-align: center;
+    background-color: #3498db;
+    color: #fff;
+    padding: 10px;
+}
+
+/* Styling for question banners */
+.question-banner,
+.first-question-banner {
+    text-align: center;
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+/* Map container with updated sizing */
+.map-container {
+    width: 100%;
+    max-width: 1400px;
+    height: 900px;
+    background-color: #fff;
+    margin: 20px auto;
+    padding: 0;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Dropdown container styling */
+.year-dropdown-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    /* For custom arrow positioning */
+    margin-bottom: 20px;
+}
+
+.year-dropdown-container label {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+/* Custom dropdown styling - compact and professional */
+.custom-dropdown {
+    position: relative;
+    width: 120px;
+}
+
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #3498db;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+    outline: none;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+select:hover {
+    border-color: #2980b9;
+}
+
+select:focus {
+    border-color: #4CAF50;
+}
+
+/* Custom arrow styling */
+.year-dropdown-container::after {
+    content: '▼';
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 12px;
+    color: #333;
+}
+
+select::-ms-expand {
+    display: none;
+    /* Hide the default arrow on IE */
+}
+
+/* Button switch styles */
+.switch-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.switch-buttons button {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    margin: 0 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.switch-buttons button:hover {
+    background-color: #1d6fa5;
+    color: #fff;
+}
+
+.switch-buttons button.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.switch-buttons button:focus {
+    outline: none;
+    box-shadow: 0px 0px 8px rgba(0, 128, 0, 0.4);
+}
+
+/* General Canvas Styling for Charts */
+canvas {
+    margin: 20px auto;
+    display: block;
+    background-color: #fff;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    max-width: 1000px;
+    height: 500px;
+}
+
+/* Specific Styling for the Pie Chart Canvas */
+#pieChart {
+    max-width: 250px;
+    /* Reduced the size to 250px */
+    height: auto;
+    aspect-ratio: 1 / 1;
+    margin: 20px auto;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* Responsive styles for the pie chart */
+@media (max-width: 768px) {
+    #pieChart {
+        max-width: 180px;
+        /* Further reduced size on smaller screens */
+    }
+}
+
+/* Footer styling */
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #333;
+    color: #fff;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .map-container {
+        height: 400px;
+    }
+
+    canvas {
+        height: 300px;
+    }
+
+    #pieChart {
+        max-width: 180px;
+        /* Reduced for smaller screens */
+    }
+}
+
+/* Style specifically for the yearSelect dropdown */
+#yearSelect {
+    width: auto;
+    padding: 8px;
+    border: 1px solid #3498db;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+    margin-top: 10px;
+}
+
+#yearSelect:hover {
+    border-color: #2980b9;
+}
+
+#yearSelect:focus {
+    border-color: #4CAF50;
+}
+
+/* Add custom arrow styling */
+.year-dropdown-container select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 20px;
+}
+
+.year-dropdown-container::after {
+    content: '▼';
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}

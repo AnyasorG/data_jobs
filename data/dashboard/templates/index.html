@@ -4,33 +4,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Dashboard</title>
+    <title>Data Analyst Jobs Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+    <!-- D3 JavaScript -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- Map files -->
+    <script src="/static/js/performance_fix.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-core.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-map.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.7.1/geodata/custom/world/world.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.15/proj4.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-data-adapter.min.js"></script>
+
+    <!-- Deferred JS files -->
+    <script defer src="/static/js/barchart_logic.js"></script>
+    <script defer src="/static/js/map_logic.js"></script>
+    <script defer src="/static/js/piechart_logic.js"></script>
+    <script defer src="/static/js/linechart_logic.js"></script>
+
+    <!-- Internal CSS for layout and responsiveness -->
+    <style>
+        /* General body styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+        }
+
+        header {
+            text-align: center;
+            background-color: #3498db;
+            color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        h1,
+        h2 {
+            margin: 0;
+        }
+
+        /* Question banners */
+        .question-banner {
+            text-align: center;
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Responsive map container */
+        .map-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 700px;
+            margin: 20px auto;
+        }
+
+        /* Dropdown container styling */
+        .year-dropdown-container,
+        .switch-buttons {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        /* Dropdown styling */
+        select {
+            width: 150px;
+            padding: 8px;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        /* Buttons styling */
+        .switch-buttons button {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .switch-buttons button:hover {
+            background-color: #2980b9;
+        }
+
+        .switch-buttons button.active {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        /* Barchart and Piechart Styling */
+        canvas#DataJobChart {
+            width: 100%;
+            max-width: 1000px;
+            height: 400px;
+            margin: 20px auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            padding: 10px;
+        }
+
+        /* Specific styling for pie chart */
+        #pieChart {
+            width: 100%;
+            max-width: 600px;
+            /* Adjust to fit a moderate size */
+            height: auto;
+            margin: 20px auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            padding: 10px;
+        }
+
+        /* Adjust line chart container */
+        #chartsContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .chart {
+            width: 100%;
+            max-width: 1000px;
+            height: 400px;
+            margin: 20px auto;
+        }
+
+        /* Responsive styles for smaller screens */
+        @media (max-width: 768px) {
+            .map-container {
+                height: 400px;
+            }
+
+            canvas#DataJobChart,
+            canvas#pieChart {
+                max-width: 90%;
+                height: auto;
+            }
+
+            .chart {
+                height: 300px;
+            }
+        }
+
+        /* Footer styling */
+        footer {
+            text-align: center;
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>Dynamic Data Visualizations</h1>
+    <header>
+        <h1> Data Analyst Job & Salary Dashboard</h1>
+        <h2> Trends in data-related careers (2020-2024)</h2>
+    </header>
 
-        <!-- Country Chart -->
-        <h2>Job Opportunities by Country</h2>
-        <canvas id="countriesChart"></canvas>
-
-        <!-- Salary Chart -->
-        <h2>Salary Expectations</h2>
-        <canvas id="salaryChart"></canvas>
-
-        <!-- Entry-Level Hiring Chart -->
-        <h2>Entry-Level Job Opportunities by Company</h2>
-        <canvas id="entryLevelChart"></canvas>
-
-        <!-- Yearly Trends Chart -->
-        <h2>Yearly Salary and Job Trends</h2>
-        <canvas id="yearlyTrendsChart"></canvas>
+    <!-- Question 1: Countries with job opportunities -->
+    <div class="question-banner">
+        <h2 id="question1"> Which countries offer more job opportunities?</h2>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <!-- Map container -->
+    <div class="map-container" id="mapContainer"></div>
+
+    <!-- Question 2: Salary Expectations -->
+    <div class="question-banner">
+        <h2 id="question2"> How much can one expect to earn in the US?</h2>
+    </div>
+
+    <!-- Year selection -->
+    <div class="year-dropdown-container">
+        <label for="yearSelection"><strong>Select year:</strong></label>
+        <select id="yearSelection">
+            <option value="all">All Years</option>
+            <option value="2020">2020</option>
+            <option value="2021">2021</option>
+            <option value="2022">2022</option>
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+        </select>
+    </div>
+
+    <!-- Chart Buttons -->
+    <div class="switch-buttons">
+        <button id="jobCategoryBtn" class="active">Job Category</button>
+        <button id="experienceLevelBtn">Experience Level</button>
+        <button id="jobTitleBtn">Job Title</button>
+    </div>
+
+    <!-- Canvas for Barchart -->
+    <canvas id="DataJobChart"></canvas>
+
+    <!-- Question 3: Companies hiring entry-level -->
+    <div class="question-banner">
+        <h2 id="question3"> What companies in the US hire more entry-level employees?</h2>
+    </div>
+
+    <!-- Year dropdown selector -->
+    <div class="year-dropdown-container">
+        <label for="yearSelect"><strong>Select year:</strong></label>
+        <select id="yearSelect">
+            <option value="all">All Years</option>
+            <option value="2020">2020</option>
+            <option value="2021">2021</option>
+            <option value="2022">2022</option>
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+        </select>
+    </div>
+
+    <!-- Buttons for Company Size and Work Setting -->
+    <div class="switch-buttons">
+        <button id="companySizeBtn">US Company Size-Entry Level</button>
+        <button id="workSettingBtn">US Work Setting-Entry Level</button>
+    </div>
+
+    <!-- Canvas for Pie Chart -->
+    <canvas id="pieChart"></canvas>
+
+    <!-- Question 4: Trends over the years -->
+    <div class="question-banner">
+        <h2 id="question4"> What data job trends can be observed over the past years?</h2>
+    </div>
+
+    <!-- Radio buttons for chart type -->
+    <div>
+        <input type="radio" name="chartType" value="salaryTrendChart" checked>
+        <label for="salaryTrendChart">Salary Trend</label>
+
+        <input type="radio" name="chartType" value="jobCountTrendChart">
+        <label for="jobCountTrendChart">Job Count Trend</label>
+    </div>
+
+    <!-- Single canvas for both line charts -->
+    <canvas id="lineChart" class="chart"></canvas>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 DataInsight Lab</p>
+    </footer>
 </body>
 
-</html>
+</

@@ -1,16 +1,65 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // 1. Countries offering more job opportunities
+    loadJobMap();
+    loadSalaryChart();
+    loadUSEntryLevelChart();
+    loadYearlyTrendsChart();
+});
+
+// Function to load the map with job opportunities by country
+function loadJobMap() {
     fetch('/countries-data')
         .then(response => response.json())
         .then(data => {
-            const ctx = document.getElementById('countriesChart').getContext('2d');
+            const map = L.map('jobMap').setView([20, 0], 2);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            for (const country in data) {
+                getLatLonFromNominatim(country).then(latLon => {
+                    if (latLon) {
+                        L.marker(latLon).addTo(map)
+                            .bindPopup(`${country}: ${data[country]} job opportunities`);
+                    }
+                }).catch(err => {
+                    console.error(`Error fetching coordinates from Nominatim for ${country}:`, err);
+                });
+            }
+        })
+        .catch(err => console.error('Error loading job map:', err));
+}
+
+// Function to get latitude and longitude from Nominatim API
+function getLatLonFromNominatim(countryCode) {
+    const url = `https://nominatim.openstreetmap.org/search?country=${countryCode}&format=json&limit=1`;
+    return fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+            }
+            return null;
+        })
+        .catch(err => {
+            console.error(`Error fetching coordinates from Nominatim for ${countryCode}:`, err);
+            return null;
+        });
+}
+
+// Salary chart: Average salary by job title and experience level
+function loadSalaryChart() {
+    const experienceLevel = document.getElementById('experienceLevelSelect').value;
+    fetch(`/salary-data?experience_level=${experienceLevel}`)
+        .then(response => response.json())
+        .then(data => {
+            const ctx = document.getElementById('salaryChart').getContext('2d');
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: Object.keys(data),
+                    labels: data.job_titles,
                     datasets: [{
-                        label: 'Job Opportunities',
-                        data: Object.values(data),
+                        label: 'Average Salary',
+                        data: data.average_salaries,
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 1
@@ -24,63 +73,34 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             });
-        });
+        })
+        .catch(err => console.error('Error loading salary chart:', err));
+}
 
-    // 2. Salary expectation data (Box Plot)
-    fetch('/salary-data')
-        .then(response => response.json())
-        .then(data => {
-            const ctx = document.getElementById('salaryChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'boxplot',
-                data: {
-                    labels: ['Salary'],
-                    datasets: [{
-                        label: 'Salary Distribution',
-                        data: data,
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        });
-
-    // 3. Entry-level job opportunities by companies
-    fetch('/entry-level-data')
+// US entry-level job chart
+function loadUSEntryLevelChart() {
+    const year = document.getElementById('yearSelect').value;
+    fetch(`/us-entry-level-data?year=${year}`)
         .then(response => response.json())
         .then(data => {
             const ctx = document.getElementById('entryLevelChart').getContext('2d');
             new Chart(ctx, {
-                type: 'bar',
+                type: 'pie',
                 data: {
                     labels: Object.keys(data),
                     datasets: [{
-                        label: 'Entry-Level Jobs',
+                        label: 'US Entry-Level Jobs',
                         data: Object.values(data),
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
                     }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
                 }
             });
-        });
+        })
+        .catch(err => console.error('Error loading US entry-level chart:', err));
+}
 
-    // 4. Yearly trends (Line Chart)
+// Yearly trends chart
+function loadYearlyTrendsChart() {
     fetch('/yearly-trends-data')
         .then(response => response.json())
         .then(data => {
@@ -92,15 +112,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     datasets: [{
                         label: 'Average Salary',
                         data: data.salaries,
-                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                        borderColor: 'rgba(153, 102, 255, 1)',
-                        borderWidth: 1
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        fill: false
                     }, {
                         label: 'Job Count',
                         data: data.job_counts,
-                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
-                        borderColor: 'rgba(255, 159, 64, 1)',
-                        borderWidth: 1
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        fill: false
                     }]
                 },
                 options: {
@@ -111,5 +129,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             });
-        });
-});
+        })
+        .catch(err => console.error('Error loading yearly trends chart:', err));
+}
